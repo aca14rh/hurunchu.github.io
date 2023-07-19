@@ -235,7 +235,7 @@
       let image = './EMOJI/'+ CHOSEN_SET[which] + '.png';
       let style = 'top:' + y + 'px;left:' + x + 'px';
       // AM
-      if (IS_AM) style+='; width: 8em; height: auto' 
+      if (IS_AM) style+='; height: 8em; width: auto' 
       let objElem = '<img id="' + id + '" src="'+ image +'" class="obj" style="'+ style +'" >';
       $('.main').append(objElem);
     };
@@ -257,7 +257,7 @@
         scale: scale,
         rotate: initAngle,
         easing: 'easeOutQuad',
-        duration: 800,
+        duration: IS_AM ? 1200 : 800,
         autoplay: false,
         complete: function() {
           removeObj(id);

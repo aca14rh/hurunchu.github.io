@@ -235,7 +235,14 @@
       let image = './EMOJI/'+ CHOSEN_SET[which] + '.png';
       let style = 'top:' + y + 'px;left:' + x + 'px';
       // AM
-      if (IS_AM) style+='; height: 8em; width: auto' 
+      if (IS_AM) {
+        let type = which.split('-')[0]
+        if (type===1) style+='; width: 110px;'
+        if (type===2) style+='; width: 130px;'
+        if (type===3) style+='; width: 120px;'
+        if (type===4) style+='; width: 80px;'
+        style+='height: auto'
+      }
       let objElem = '<img id="' + id + '" src="'+ image +'" class="obj" style="'+ style +'" >';
       $('.main').append(objElem);
     };

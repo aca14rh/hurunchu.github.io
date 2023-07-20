@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>KTRS</title>
+    <meta name="name" content="A" />
+    <meta name="author" content="rh13068@gmail.com" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui"
+    />
+  </head>
+
+  <script src="https://cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script>
+  <script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      font-family: Helvetica, Arial, sans-serif, Apple Color Emoji,
+        Segoe UI Emoji, Segoe UI Symbol;
+    }
+    .wrapper {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      background-color: #0a0a0a;
+      min-height: 430px;
+      min-width: 500px;
+      overflow: hidden;
+    }
+    .obj {
+      position: absolute;
+      height: 15px;
+      width: 15px;
+      font-size: 12px;
+      background-color: #0d0d0de4;
+      color: rgba(255, 255, 255, 0.9);
+    }
+    img {
+      position: absolute;
+      top: 270px;
+      left: -100px;
+      width: 400px;
+    }
+  </style>
+  <body>
+    <div class="wrapper"><img src="./images/ciga_1280.jpg" /></div>
+  </body>
+  <script>
+let appkey = "33827583657e8d49b7bfe03b0f533d8e";
+let type = "guoji";
+let url = `http://v.juhe.cn/toutiao/index?type=${type}&key=${appkey}`;
+
+// top(头条，默认),shehui(社会),guonei(国内),guoji(国际),yule(娱乐),tiyu(体育)junshi(军事),keji(科技),caijing(财经),shishang(时尚)
+  
+let refreshNews = () => {
+  let getNews = new Promise((res, rej) => {
+    // $.ajax({
+    //   url: "../news/guoji.json",
+    //   type: "GET",
+    //   dataType: "json",
+    //   success: (data) => {
+    //     res(data);
+    //     console.log("success");
+    //   },
+    //   error: (err) => {
+    //     rej(err);
+    //   },
+    // });
+    $.ajax({
+      url,
+      type: "GET",
+      dataType: "json",
+      success: (data) => {
+        res(data);
+        console.log("success--", data);
+      },
+      error: (err) => {
+        rej(err);
+      },
+    });
+  });
+
+  getNews.then(
+    console.log("start");
+    (res) => {
+      // console.log(res);
+      let kwords = [],
+        news = res.result.data,
+        newsCount = news.length;
+
+      for (let i = 0; i < newsCount; i++) {
+        let thisNews = news[i].title;
+        let broken = thisNews
+          .replace(
+            /[\ |\~|\ ：|\`|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\-|\_|\+|\=|\||\\|\[|\]|\{|\}|\;|\:|\"|\'|\,|，|。|“|”！|？|\<|\.|\>|\/|\?]/g,
+            ""
+          )
+          .split("");
+        for (let j = 0; j < broken.length; j++) {
+          let thisWord = broken[j];
+          if (chineseNumMap.hasOwnProperty(thisWord)) {
+            thisWord = chineseNumMap[thisWord];
+          }
+          kwords.push(thisWord);
+        }
+        kwords.push(" ");
+        kwords.push(" ");
+      }
+
+      playWords();
+      update = setInterval(() => {
+        playWords();
+      }, kwords.length * 300);
+
+      function playWords() {
+        for (let i = 0, len = kwords.length; i < len; i++) {
+          setTimeout(() => {
+            init(kwords[i]);
+          }, i * 300);
+        }
+      }
+    },
+    (reason) => {
+      console.warn("internet error:", reason);
+    }
+  );
+};
+
+let update = null;
+refreshNews();
+setInterval(() => {
+  clearInterval(update);
+  refreshNews();
+}, 20 * 60 * 1000);
+
+let chineseNumMap = {
+  0: "零",
+  1: "壹",
+  2: "贰",
+  3: "叁",
+  4: "肆",
+  5: "伍",
+  6: "陆",
+  7: "柒",
+  8: "捌",
+  9: "玖",
+};
+
+let startPos = [210, 390]; // start position: [x,y]
+let objTatal = 10; // in-screen objects total number
+let startAangle = 80; // shooting direction: degree
+let endAangle = 115; // shooting direction: degree
+let range = 360; // shooting range: px
+let speed = 2; // speed levels: 1-10
+let rotateRange = 60; // total rotate range: degree
+let crazyness = 3; // speed to generateObj for one click;
+let scale = 1.6; // scale: times
+
+let autoAngle = (startAangle + endAangle) / 2 - 180;
+let initAngle = 0; //autoAngle;
+let interval = 500;
+let intervalIns;
+
+let windowWidth = $(window).width();
+let windowHeight = $(window).height();
+let imgTop = windowHeight ? windowHeight / 2 - 100 : 290;
+
+startPos = [210, imgTop + 100];
+
+$("img").css("top", windowHeight / 2 - 100);
+if (windowWidth > 500) {
+  $("img").css("left", windowWidth / 2 - 200);
+  startPos[0] = windowWidth / 2 + 110;
+}
+
+function generateObj(id, word) {
+  if (id && word) {
+    let objElem = `<div id="${id}" class="obj"><div class="jimo">${word}</div></div>`;
+    let initRotate = "rotate(" + initAngle + "deg)";
+    $(".wrapper").append(objElem);
+    $("#" + id).css({
+      top: startPos[1],
+      left: startPos[0],
+      transform: initRotate,
+    });
+  }
+}
+
+function removeObj(id) {
+  $("#" + id).remove();
+}
+
+function makeAnime(id) {
+  let shootAngle = Math.random() * (endAangle - startAangle) + startAangle;
+  let thisRange = (Math.random() * range) / 4 + (3 * range) / 4;
+  let transX = thisRange * Math.cos((shootAngle * Math.PI) / 180) || 100;
+  let transY = thisRange * Math.sin((shootAngle * Math.PI) / 180) || 100;
+
+  let thisScale = Math.random() * 0.3 + 1.2;
+
+  let duration = (11 - speed) * (11 - speed) * 100;
+
+  let rotate = parseInt((0.5 - Math.random()) * rotateRange + initAngle);
+
+  return anime({
+    targets: "#" + id,
+    translateX: -transX,
+    translateY: -transY,
+    scale: scale,
+    opacity: "0.2",
+    rotate: rotate,
+    easing: "easeOutQuad",
+    duration: duration,
+    autoplay: false,
+    complete: function () {
+      removeObj(id);
+    },
+  });
+}
+
+function init(word) {
+  let id = "_" + guidGenerator();
+  generateObj(id, word);
+  let anime = makeAnime(id);
+  anime.play();
+}
+
+function guidGenerator() {
+  let S4 = function () {
+    return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+  };
+  return (
+    S4() +
+    S4() +
+    "-" +
+    S4() +
+    "-" +
+    S4() +
+    "-" +
+    S4() +
+    "-" +
+    S4() +
+    S4() +
+    S4()
+  );
+}
+
+  </script>
+</html>

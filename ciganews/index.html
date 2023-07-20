@@ -113,11 +113,19 @@ let refreshNews = () => {
       }, kwords.length * 300);
 
       function playWords() {
-        for (let i = 0, len = kwords.length; i < len; i++) {
+        const len = kwords.length;
+        const loopTask = (i) => {
+          if(i>=len){
+            return;
+          }
+          init(kwords[i]);
           setTimeout(() => {
-            init(kwords[i]);
-          }, i * 300);
+            requestAnimationFrame(() => {
+              loopTask(i + 1);
+            });
+          }, 300);
         }
+        loopTask(0);
       }
     },
     (reason) => {

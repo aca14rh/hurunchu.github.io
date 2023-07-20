@@ -69,18 +69,22 @@ let refreshNews = () => {
     //     rej(err);
     //   },
     // });
-    $.ajax({
-      url,
-      type: "GET",
-      dataType: "json",
-      success: (data) => {
-        res(data);
-        console.log("success--", data);
-      },
-      error: (err) => {
-        rej(err);
-      },
+    console.warn('start)'
+    $.getJSON(url, function(result){  
+      console.log("success", result);
     });
+    // $.ajax({
+    //   url,
+    //   type: "GET",
+    //   dataType: "json",
+    //   success: (data) => {
+    //     res(data);
+    //     console.log("success--", data);
+    //   },
+    //   error: (err) => {
+    //     rej(err);
+    //   },
+    // });
   });
   console.log("start");
   getNews.then(

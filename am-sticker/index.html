@@ -10,11 +10,22 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            background: -webkit-linear-gradient(0deg,
+                    #e1e8e5,
+                    #a0a5a6 25%,
+                    #616263 50%,
+                    #a0a5a6 75%,
+                    #e1e8e5
+                    );
+            -webkit-background-size: 400% 100%;
+            animation: flowCss 20s infinite linear;
+            -webkit-animation: flowCss 20s infinite linear;
         }
+        
         /* 加上 -webkit- 注意兼容 */
         .bg {
-            height: 500px; width: 1500px;
-            position: absolute; top: 0; left: 0;
+            height: 600px; width: 1800px;
+            position: absolute; top: 100px; left: 20px; z-index: -1;
             background: -webkit-linear-gradient(0deg,
                     #0eaf6d,
                     #ff6ac6 8%,
@@ -46,18 +57,18 @@
         }
 
         .card {
-           width: 400px;
-           height: 500px;
+            width: 480px;
+            height: 600px;
            overflow: hidden;
-           transform: translateZ(50px);
+           transform: translateZ(100px);
            z-index: 9999;
         }
 
         .data-tilt{
-            margin-top: calc(50vh - 250px);
+            margin-top: calc(50vh - 350px);
             box-sizing: border-box;
-            width: 400px;
-            height: 500px;
+            width: 480px;
+            height: 600px;
             overflow: hidden;
             border: 1px solid black;
             border-radius: 20px;
@@ -71,23 +82,20 @@
             transform: perspective(300px);
         }
         
-        img{
-            position: relative;
-            z-index: 99999;
-        }
     </style>
 </head>
 
 <body>
     <div data-tilt class="data-tilt" data-tilt-axis="x" data-tilt-glare="true" data-tilt-max-glare="0.5" data-tilt-perspective="400" data-tilt-scale="1" data-tilt-speed="400" data-tilt-max="10">
-            <!-- <div class="bg"></div> -->
-<!--             <video height="400" muted autoplay="true" loop="true" control="false" style="position: absolute; top: 0; left: 0; font-size:0; ">
-                <source src="bg-neon-1.mp4" type="video/mp4">
-            </video> -->
-            <img class="bg" src="neon.gif"/>
-            <!-- <div class="card" style="position: absolute; top: 0; left: 0; z-index: 999; font-size:0; "> -->
+      
+            <img class="bg" id="bg2" src="colors.gif" width="350px"/>
+            <img class="bg" id="bg3" src="neon.gif" width="350px"/>
+            <img class="bg" id="bg4" src="water.gif" width="350px"/>
+            <img class="bg" id="bg5" src="metal.gif" width="350px"/>
+            <div class="bg" id="bg1"></div>
+        
             <div class="card">
-                <img class="pic" src="cb-colors-flow-card.png"/>
+                <img class="pic" height="600" src="cb-colors-flow-card.png"/>
                 <!-- <img src="cb-colors-flow-card-cover.png" style="position: absolute; top: 0; left: 0; z-index: 99999; opacity: 0.5;"/> -->
             </div>
     </div>    
@@ -95,8 +103,13 @@
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.4/jquery.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tilt.js/1.2.1/tilt.jquery.min.js"></script>
     <script>
+        let bg_index = 1;
         $('.card').click(()=>{
-            $('.pic').src
+            bg_index+=1; if (bg_index>5) bg_index = 1;
+            let curr = '#bg'+bg_index
+            console.warn('change ', curr)
+            $('.bg').hide();
+            $(curr).show();
         });
         const tilt = $('#data-tilt').tilt();
 

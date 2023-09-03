@@ -1,1 +1,124 @@
 
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        body {
+            /* margin: 0; padding: 0; font-size: 0; */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: -webkit-linear-gradient(0deg,
+                    #e1e8e5,
+                    #a0a5a6 25%,
+                    #616263 50%,
+                    #a0a5a6 75%,
+                    #e1e8e5
+                    );
+            -webkit-background-size: 400% 100%;
+            animation: flowCss 20s infinite linear;
+            -webkit-animation: flowCss 20s infinite linear;
+        }
+        
+        /* 加上 -webkit- 注意兼容 */
+        .bg {
+            height: 600px; width: 1800px;
+            position: absolute; top: 100px; left: 20px; z-index: -1;
+            background: -webkit-linear-gradient(0deg,
+                    #0eaf6d,
+                    #ff6ac6 8%,
+                    #147b96 15%,
+                    #e6d205 25%,
+                    #2cc4e0 35%,
+                    #8b2ce0 45%,
+                    #ff6384 55%,
+                    #08dfb4 65%,
+                    #e6d205 75%,
+                    #ff6ac6 88%,
+                    #0eaf6d
+                    );
+            -webkit-background-size: 200% 100%;
+            /* 应用动画flowCss 12秒速度 无限循环 线性匀速动画*/
+            animation: flowCss 20s infinite linear;
+            -webkit-animation: flowCss 20s infinite linear;
+        }
+
+        @-webkit-keyframes flowCss {
+            0% {
+                /* 移动背景位置 */
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: -400% 0;
+            }
+        }
+
+        .card {
+            width: 720px;
+            height: 900px;
+           overflow: hidden;
+           transform: translateZ(100px);
+           z-index: 9999;
+        }
+
+        .data-tilt{
+            margin-top: calc(50vh - 480px);
+            box-sizing: border-box;
+            width: 720px;
+            height: 900px;
+            overflow: hidden;
+            border: 1px solid black;
+            border-radius: 20px;
+            transform: translateZ(50px);
+            display: block;
+            text-align: center;
+            /* background-color: #9e21ff;
+            background-image: linear-gradient(135deg, #ed21ff 0%, #9e21ff 100%, #9e21ff 100%); */
+            box-shadow: 0 3px 47px rgba(0, 0, 0, 0.2);
+            transform-style: preserve-3d;
+            transform: rotateY(30);
+            transform: perspective(300px);
+        }
+        .data-tilt:hover{
+            transform: rotateY(300px);
+        }
+        
+    </style>
+</head>
+
+<body>
+    <div class="data-tilt" data-tilt-axis="x" data-tilt-glare="true" data-tilt-max-glare="0.5" data-tilt-perspective="400" data-tilt-scale="1" data-tilt-speed="400" data-tilt-max="10">
+      
+            <img class="bg" id="bg2" src="../colors.gif" width="350px"/>
+            <img class="bg" id="bg3" src="../neon.gif" width="350px"/>
+            <img class="bg" id="bg4" src="../water.gif" width="350px"/>
+            <img class="bg" id="bg5" src="../metal.gif" width="350px"/>
+            <div class="bg" id="bg1"></div>
+        
+            <div class="card">
+                <img class="pic" height="900" src="../cb-colors-flow-card.png"/>
+                <!-- <img src="cb-colors-flow-card-cover.png" style="position: absolute; top: 0; left: 0; z-index: 99999; opacity: 0.5;"/> -->
+            </div>
+    </div>    
+
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.4/jquery.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tilt.js/1.2.1/tilt.jquery.min.js"></script>
+    <script>
+        let bg_index = 1;
+        $('.card').click(()=>{
+            bg_index+=1; if (bg_index>5) bg_index = 1;
+            let curr = '#bg'+bg_index
+            console.warn('change ', curr)
+            $('.bg').hide();
+            $(curr).show();
+        });
+        // const tilt = $('#data-tilt').tilt();
+
+    </script>
+</body>
+
+</html>

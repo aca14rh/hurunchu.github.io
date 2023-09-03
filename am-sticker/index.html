@@ -13,13 +13,13 @@
             background: -webkit-linear-gradient(0deg,
                     #e1e8e5,
                     #a0a5a6 25%,
-                    #616263 50%,
+                    #7b7d7d 50%,
                     #a0a5a6 75%,
                     #e1e8e5
                     );
             -webkit-background-size: 400% 100%;
-            animation: flowCss 20s infinite linear;
-            -webkit-animation: flowCss 20s infinite linear;
+            animation: flowCss 30s infinite linear;
+            -webkit-animation: flowCss 30s infinite linear;
         }
         
         /* 加上 -webkit- 注意兼容 */
@@ -65,7 +65,7 @@
         }
 
         .data-tilt{
-            margin-top: calc(50vh - 350px);
+            margin-top: calc(50vh - 300px);
             box-sizing: border-box;
             width: 480px;
             height: 600px;
@@ -75,11 +75,19 @@
             transform: translateZ(50px);
             display: block;
             text-align: center;
-            /* background-color: #9e21ff;
-            background-image: linear-gradient(135deg, #ed21ff 0%, #9e21ff 100%, #9e21ff 100%); */
             box-shadow: 0 3px 47px rgba(0, 0, 0, 0.2);
+
             transform-style: preserve-3d;
+            transform: rotateY(30deg);
             transform: perspective(300px);
+        }
+        .data-tilt:hover{
+            transform: rotateY(300px);
+        }
+        .button{
+            cursor: pointer;
+            width: 120px;
+            position: absolute; bottom: 0; right: 0;
         }
         
     </style>
@@ -95,23 +103,31 @@
             <div class="bg" id="bg1"></div>
         
             <div class="card">
-                <img class="pic" height="600" src="cb-colors-flow-card.png"/>
-                <!-- <img src="cb-colors-flow-card-cover.png" style="position: absolute; top: 0; left: 0; z-index: 99999; opacity: 0.5;"/> -->
+                <img class="pic" height="600" src="cb-card.png"/>
             </div>
-    </div>    
+    </div>  
+    
+    <img class="button" src="fish.gif"/>
 
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.4/jquery.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tilt.js/1.2.1/tilt.jquery.min.js"></script>
     <script>
+        const tilt = $('#data-tilt').tilt();
+
         let bg_index = 1;
         $('.card').click(()=>{
-            bg_index+=1; if (bg_index>5) bg_index = 1;
             let curr = '#bg'+bg_index
-            console.warn('change ', curr)
             $('.bg').hide();
             $(curr).show();
+            bg_index+=1; if (bg_index>5) bg_index = 1;
         });
-        const tilt = $('#data-tilt').tilt();
+
+        const kbds = ['cb-card.png', 'less-card.png', 'afa-card.png', 'hatsu-card.png']
+        let kbd_index = 0;
+        $('.button').click(()=>{
+            $('.pic').attr('src', kbds[kbd_index]);
+            kbd_index+=1; if (kbd_index>=kbds.length) kbd_index = 0;
+        });
 
     </script>
 </body>

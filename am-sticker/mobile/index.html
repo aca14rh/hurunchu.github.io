@@ -127,6 +127,9 @@
 
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.4/jquery.js"></script>
     <script>
+        setTimeout(()=>{
+          $('.modal').hide();
+        }, 3000)
         let bg_index = 1;
         $('.card').click(()=>{
             let curr = '#bg'+bg_index

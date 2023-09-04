@@ -81,19 +81,32 @@
             transform: rotateY(30deg);
             transform: perspective(300px);
         }
-        .data-tilt:hover{
+        .data-tilt:hover {
             transform: rotateY(300px);
         }
-        .button{
+        .button {
             cursor: pointer;
             width: 120px;
             position: absolute; bottom: 0; right: 0;
+        }
+        .modal {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background-color: #000;
+          z-index: 99999;
+          opacity: 0.8;
         }
         
     </style>
 </head>
 
 <body>
+    <div class="modal">
+      <img src="modal.png">
+    </div>
     <div data-tilt class="data-tilt" data-tilt-axis="x" data-tilt-glare="true" data-tilt-max-glare="0.5" data-tilt-perspective="400" data-tilt-scale="1" data-tilt-speed="400" data-tilt-max="10">
       
             <img class="bg" id="bg2" src="colors.gif" width="350px"/>
@@ -112,6 +125,10 @@
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.4/jquery.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tilt.js/1.2.1/tilt.jquery.min.js"></script>
     <script>
+        setTimeout(()=>{
+          $('.modal').hide();
+        }, 3000)
+
         const tilt = $('#data-tilt').tilt();
 
         let bg_index = 1;

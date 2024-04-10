@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>KTRS</title>
+    <meta name="name" content="A BYTE OF FUN" />
+    <meta name="author" content="rh13068@gmail.com" />
+    <link rel="icon" href="/images/bigness.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="/images/bigness.ico" type="image/x-icon" />
+    <link href="/stylesheets/style.css" rel="stylesheet" type="text/css" />
+  </head>
+
+  <script src="https://cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script>
+  <script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script>
+
+  <body>
+    <!-- content -->
+    <div class="content">
+      <div class="modal">
+        <h1>:: dot clock ::</h1>
+      </div>
+      <div class="clock-wrapper">
+        <div class="clock-area"></div>
+        <div class="projector"></div>
+      </div>
+    </div>
+    <!-- content -->
+    <!-- content -->
+    <div class="content">
+      <video class="bg-video" autoplay muted loop>
+        <!--source src="/videos/time_dust.mov"-->
+      </video>
+
+      <div class="text-wrapper">
+        <div class="text-area">
+          <span class="h1"></span
+          ><!--span class="type-mark">_<span-->
+        </div>
+        <div class="lightDot">
+          <div class="lightHoloCenter"></div>
+          <div class="lightHolo holo1"></div>
+          <div class="lightHolo holo2"></div>
+          <div class="lightHolo holo3"></div>
+        </div>
+      </div>
+    </div>
+    <!-- /content -->
+    <!-- main page -->
+    <div class="main">
+      <!--  btns -->
+      <div class="btn-wrapper">
+        <div class="btn-area">
+          <!-- btn no1 -->
+          <div class="btn">
+            <div class="btn-text">dot clock</div>
+            <div class="vib-holo red-vib">
+              <div class="btn-text">dot clock</div>
+            </div>
+            <div class="vib-holo green-vib">
+              <div class="btn-text">dot clock</div>
+            </div>
+            <div class="vib-holo blue-vib">
+              <div class="btn-text">dot clock</div>
+            </div>
+          </div>
+          <!-- /btn no1 -->
+          <!-- btn no2 -->
+          <div class="btn">
+            <div class="btn-text">a haze</div>
+            <div class="vib-holo red-vib">
+              <div class="btn-text">a haze</div>
+            </div>
+            <div class="vib-holo green-vib">
+              <div class="btn-text">a haze</div>
+            </div>
+            <div class="vib-holo blue-vib">
+              <div class="btn-text">a haze</div>
+            </div>
+          </div>
+          <!-- /btn no2 -->
+        </div>
+      </div>
+      <!--  /btns -->
+    </div>
+  </body>
+  <script>
+    /******* settings *********/
+    var zero = [
+      [0, 1, 1, 0],
+      [1, 0, 0, 1],
+      [1, 0, 0, 1],
+      [1, 0, 0, 1],
+      [1, 0, 0, 1],
+      [1, 0, 0, 1],
+      [0, 1, 1, 0],
+    ];
+    var one = [
+      [0, 1, 0, 0],
+      [1, 1, 0, 0],
+      [0, 1, 0, 0],
+      [0, 1, 0, 0],
+      [0, 1, 0, 0],
+      [0, 1, 0, 0],
+      [1, 1, 1, 0],
+    ];
+    var two = [
+      [0, 1, 1, 0],
+      [1, 0, 0, 1],
+      [1, 0, 0, 1],
+      [0, 0, 0, 1],
+      [0, 0, 1, 0],
+      [0, 1, 0, 0],
+      [1, 1, 1, 1],
+    ];
+    var three = [
+      [0, 1, 1, 0],
+      [1, 0, 0, 1],
+      [0, 0, 0, 1],
+      [0, 0, 1, 0],
+      [0, 0, 0, 1],
+      [1, 0, 0, 1],
+      [0, 1, 1, 0],
+    ];
+    var four = [
+      [0, 0, 1, 0],
+      [0, 0, 1, 0],
+      [0, 1, 0, 0],
+      [0, 1, 0, 0],
+      [1, 0, 1, 0],
+      [1, 1, 1, 1],
+      [0, 0, 1, 0],
+    ];
+    var five = [
+      [1, 1, 1, 1],
+      [1, 0, 0, 0],
+      [1, 0, 0, 0],
+      [1, 1, 1, 0],
+      [0, 0, 0, 1],
+      [1, 0, 0, 1],
+      [1, 1, 1, 0],
+    ];
+    var six = [
+      [0, 1, 1, 0],
+      [1, 0, 0, 1],
+      [1, 0, 0, 0],
+      [1, 1, 1, 0],
+      [1, 0, 0, 1],
+      [1, 0, 0, 1],
+      [0, 1, 1, 0],
+    ];
+    var seven = [
+      [1, 1, 1, 1],
+      [1, 0, 0, 1],
+      [0, 0, 1, 0],
+      [0, 1, 0, 0],
+      [0, 1, 0, 0],
+      [1, 0, 0, 0],
+      [1, 0, 0, 0],
+    ];
+    var eight = [
+      [0, 1, 1, 0],
+      [1, 0, 0, 01],
+      [1, 0, 0, 1],
+      [0, 1, 1, 0],
+      [1, 0, 0, 1],
+      [1, 0, 0, 1],
+      [0, 1, 1, 0],
+    ];
+    var nine = [
+      [0, 1, 1, 0],
+      [1, 0, 0, 1],
+      [1, 0, 0, 1],
+      [0, 1, 1, 1],
+      [0, 0, 0, 1],
+      [1, 0, 0, 1],
+      [0, 1, 1, 0],
+    ];
+    var dot = [
+      [0, 0, 0],
+      [0, 1, 0],
+      [0, 0, 0],
+      [0, 0, 0],
+      [0, 0, 0],
+      [0, 1, 0],
+      [0, 0, 0],
+    ];
+    var num_map = [
+      zero,
+      one,
+      two,
+      three,
+      four,
+      five,
+      six,
+      seven,
+      eight,
+      nine,
+      dot,
+    ];
+    var btn_chosen = false;
+    var client_width = $(window).width();
+    var client_height = $(window).height();
+    var vibX = [
+      { value: 2, duration: 100 },
+      { value: -2, duration: 100 },
+      { value: -4, duration: 100 },
+      { value: 4, duration: 100 },
+      { value: 2, duration: 100 },
+      { value: -2, duration: 100 },
+      { value: -4, duration: 100 },
+      { value: 4, duration: 100 },
+      { value: -2, duration: 100 },
+      { value: 2, duration: 100 },
+      { value: 2, duration: 100 },
+    ];
+    var vibY = [
+      { value: 1, duration: 100 },
+      { value: -2, duration: 100 },
+      { value: 0, duration: 100 },
+      { value: 2, duration: 100 },
+      { value: -1, duration: 100 },
+      { value: 2, duration: 100 },
+      { value: 1, duration: 100 },
+      { value: 1, duration: 100 },
+      { value: -1, duration: 100 },
+      { value: 2, duration: 100 },
+      { value: -2, duration: 100 },
+    ];
+    var projectorX = 396;
+    var projectorY = 600; //$(".clock-wrapper").height() - 25;
+    /******* settings *********/
+
+    /*********** main ***********/
+    function startVib(elem) {
+      $(elem).children(".vib-holo").css({ display: "block" });
+      var red_vib = $(elem).children(".red-vib")[0];
+      var green_vib = $(elem).children(".green-vib")[0];
+      var blue_vib = $(elem).children(".blue-vib")[0];
+
+      vibX[0].delay = 0;
+      vibY[0].delay = 0;
+      anime({
+        targets: red_vib,
+        translateX: vibX,
+        translateY: vibY,
+        loop: true,
+      });
+
+      vibX[0].delay = 100;
+      vibY[0].delay = 100;
+      anime({
+        targets: green_vib,
+        translateX: vibX,
+        translateY: vibY,
+        loop: true,
+      });
+
+      vibX[0].delay = 160;
+      vibY[0].delay = 160;
+      anime({
+        targets: blue_vib,
+        translateX: vibX,
+        translateY: vibY,
+        loop: true,
+      });
+    }
+
+    function removeVib(elem) {
+      $(elem).children(".vib-holo").css({ display: "none" });
+      var red_vib = $(elem).children(".red-vib")[0];
+      var green_vib = $(elem).children(".green-vib")[0];
+      var blue_vib = $(elem).children(".blue-vib")[0];
+      anime.remove(red_vib);
+      anime.remove(green_vib);
+      anime.remove(blue_vib);
+    }
+
+    function startChange(elem, toPhase) {
+      let btn = $(elem);
+      let left = client_width / 2 - btn.position().left - 125 + 2;
+      let bottom = client_height - btn.position().top - 150 + 34;
+      let thisone = $(elem).index();
+      for (let i = 0; i < $(".btn").length; i++) {
+        if (i != thisone) {
+          let theother = $(".btn")[i];
+          setTimeout(function () {
+            $(theother).css({ opacity: 1 - toPhase });
+          }, 500);
+          //$(theother).css({opacity: (1-toPhase)});
+        } else {
+          let show_close = anime({
+            targets: $(".btn")[thisone],
+            translateX: left,
+            translateY: bottom,
+            easing: "easeInOutSine",
+            duration: 1000,
+          });
+          if (toPhase) {
+            $(".btn-text").fadeOut(1000);
+            showContent(thisone);
+          } else {
+            $(".btn-text").fadeIn(1000);
+            removeContent(thisone);
+            setTimeout(function () {
+              removeVib(elem);
+              anime.remove($(elem)[thisone]);
+            }, 1000);
+          }
+        }
+      }
+    }
+
+    function showContent(id) {
+      setTimeout(function () {
+        if (id == 0) {
+          openClock();
+        } else {
+          openVideoContent();
+        }
+        $(".content").eq(id).css({ display: "block" });
+      }, 800);
+    }
+
+    function removeContent(id) {
+      if (id == 0) {
+        closeClock();
+      } else {
+        closeVideoContent();
+      }
+      $(".content").eq(id).css({ display: "none" });
+    }
+
+    $(".btn").click(function () {
+      btn_chosen = !btn_chosen;
+      if (btn_chosen) {
+        // go to chosen content
+        startChange(this, btn_chosen);
+      } else {
+        // go back
+        startChange(this, btn_chosen);
+      }
+    });
+
+    $(".btn").hover(
+      function () {
+        startVib(this);
+      },
+      function () {
+        if (!btn_chosen) {
+          removeVib(this);
+        }
+      }
+    );
+    /*********** /main ***********/
+
+    /*********** clcok part ***********/
+    function initClock() {
+      //removeDot();
+      let formated_time = makeTime();
+      projectDots(formated_time);
+    }
+
+    function makeTime() {
+      var time = new Date();
+      var hour = time.getHours();
+      var min = time.getMinutes();
+      return [parseInt(hour / 10), hour % 10, parseInt(min / 10), min % 10];
+    }
+
+    function toUpdate() {
+      setInterval(function () {
+        var time = new Date();
+        var second = time.getSeconds();
+        if (second >= 50) {
+          $(".dot").fadeOut(10999);
+        }
+        if (second == 0) {
+          $(".dot").css({ opacity: 1 });
+          removeDot();
+          setTimeout(function () {
+            initClock();
+          }, 500);
+        }
+      }, 1000);
+    }
+
+    function projectDots(time) {
+      projectDot(time[0], 0);
+      projectDot(time[1], 200);
+      projectDot(10, 360);
+      projectDot(time[2], 480);
+      projectDot(time[3], 680);
+    }
+
+    function projectDot(num, offset) {
+      var count = 0;
+      var shape = num_map[num];
+      for (var i = 0; i < shape.length; i++) {
+        for (var j = 0; j < shape[i].length; j++) {
+          if (shape[i][j] == 1) {
+            count += 1;
+            let delay = (count * 100).toString();
+            let dot_id = i.toString() + j.toString() + offset.toString();
+            let transX = j * 40 - projectorX + offset;
+            let transY = (i + 1) * 40 - projectorY;
+            createDot(dot_id);
+            moveDot(dot_id, transX, transY, delay);
+          }
+        }
+      }
+    }
+
+    function createDot(dot_id) {
+      let dot_style = [
+        "position: absolute;",
+        "left: calc(50vw - 20px);",
+        "bottom: 45px;",
+        "opacity: 1",
+      ].join("");
+
+      let dot_elem = [
+        '<div class="dot ',
+        dot_id,
+        '"',
+        ' style="',
+        dot_style,
+        '">',
+        "</div>",
+      ].join("");
+      $(".clock-wrapper").append(dot_elem);
+    }
+
+    function removeDot(dot_id) {
+      anime.remove(".dot");
+      $(".dot").remove();
+    }
+
+    function moveDot(dot_id, x, y, delay) {
+      let dot = $("." + dot_id);
+      let ani = anime({
+        targets: dot[0],
+        translateX: x,
+        translateY: y,
+        easing: "easeInOutSine",
+        delay: delay,
+      });
+    }
+
+    function openClock() {
+      setTimeout(function () {
+        $(".modal").animate({ opacity: "0" }, "slow");
+      }, 1000);
+      setTimeout(function () {
+        initClock();
+        toUpdate();
+      }, 1000);
+    }
+
+    function closeClock() {
+      removeDot();
+      setTimeout(function () {
+        $(".modal").animate({ opacity: "1" }, "slow");
+      }, 1000);
+    }
+    /*********** clcok part ***********/
+
+    /*********** text part ***********/
+    var typing = true;
+
+    var dot_rising = anime({
+      targets: ".lightDot",
+      translateY: -(client_height / 2 - 90 + 25),
+      easing: "easeInOutSine",
+      duration: 2000,
+      autoplay: false,
+    });
+
+    var glowing1 = anime({
+      targets: ".holo1",
+      scale: 10,
+      opacity: "0",
+      easing: "easeInOutSine",
+      duration: 4500,
+      autoplay: false,
+      loop: true,
+    });
+    var glowing2 = anime({
+      targets: ".holo2",
+      scale: 10,
+      opacity: "0",
+      easing: "easeInOutSine",
+      duration: 4500,
+      autoplay: false,
+      loop: true,
+    });
+    var glowing3 = anime({
+      targets: ".holo3",
+      scale: 10,
+      opacity: "0",
+      easing: "easeInOutSine",
+      duration: 4500,
+      autoplay: false,
+      loop: true,
+    });
+
+    function openVideoContent() {
+      typing = true;
+      //var font = client_width/25 || 40;
+      var font = 40;
+      $(".text-wrapper").css({ "font-size": font + "px" });
+      setTimeout(function () {
+        /*
+    anime({
+      targets: '.type-mark',
+      opacity: '0',
+      loop: true,
+      direction: 'alternate',
+      easing: 'easeInOutExpo',
+      duration: 500
+    });
+    */
+        setTimeout(function () {
+          $(".lightDot").css({ display: "block" });
+          riseDot();
+          startType();
+        }, 500);
+      }, 1000);
+    }
+
+    function riseDot() {
+      dot_rising.play();
+      setTimeout(function () {
+        glowing1.play();
+        setTimeout(function () {
+          glowing2.play();
+          setTimeout(function () {
+            glowing3.play();
+          }, 1500);
+        }, 1500);
+      }, 2000);
+    }
+
+    function startType() {
+      var i = 0;
+      let text =
+        "So we beat on boats against the current borne back ceaselessly into the past";
+      text = text.toUpperCase().split(" ");
+      var typingInterval = setInterval(function () {
+        if (i < text.length) {
+          $(".text-wrapper .h1").fadeIn(200);
+          $(".text-wrapper .h1")[0].innerHTML = text[i];
+          setTimeout(function () {
+            $(".text-wrapper .h1").fadeOut(200);
+          }, 200);
+          i++;
+        } else {
+          i = 0;
+        }
+        if (!typing) {
+          $(".text-wrapper .h1")[0].innerHTML = " ";
+          window.clearInterval(typingInterval);
+        }
+      }, 600);
+    }
+
+    function closeVideoContent() {
+      $(".lightDot").css({ display: "none" });
+      typing = false;
+      dot_rising.reset();
+      glowing1.reset();
+      glowing2.reset();
+      glowing3.reset();
+    }
+    /*********** /text part ***********/
+
+    /*********** helper ***********/
+    $(window).on("resize", function () {
+      window.location.reload();
+    });
+    if (sessionStorage.getItem("visited")) {
+      console.log("visited");
+    } else {
+      console.log("no");
+      sessionStorage.setItem("visited", true);
+      setTimeout(() => {
+        sessionStorage.clear();
+      }, 2000);
+    }
+
+    /*********** /helper ***********/
+  </script>
+  <style>
+    body {
+      font-family: "Roboto", sans-serif;
+      margin: 0;
+      background-color: black;
+      overflow: hidden;
+    }
+    .welcome {
+      position: relative;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: calc(100vh + 60px);
+      color: white;
+      z-index: 99;
+      background-color: black;
+      overflow: hidden;
+    }
+    .footer {
+      position: absolute;
+      bottom: 0;
+      height: 20px;
+      padding: 20px 0;
+      width: 100%;
+      font-size: 12px;
+      opacity: 0.8;
+    }
+    .footer p {
+      position: relative;
+      text-align: center;
+      margin: 0 auto;
+    }
+    .footer a:link,
+    .footer a:active,
+    .footer a:visited {
+      color: white;
+      text-decoration: none !important;
+    }
+    .sm-nima {
+      position: absolute;
+      top: calc(50vh - 100px);
+      left: calc(50vw - 50px);
+      z-index: 101;
+    }
+    .goin-btn {
+      position: absolute;
+      display: none;
+      text-align: center;
+      width: 160px;
+      height: 50px;
+      border: 1.5px solid white;
+      border-radius: 10px;
+      bottom: 250px;
+      left: calc(50vw - 80px);
+      z-index: 101;
+    }
+    .goin-btn p {
+      padding: 0;
+      font-size: 16px;
+      margin: 16px auto;
+    }
+    .welcome-text {
+      position: absolute;
+      width: auto;
+      min-width: 100vw;
+      font-size: 80px;
+      font-weight: bold;
+      height: 80px;
+      left: 100vw;
+      top: calc(50vh - 40px);
+      z-index: 100;
+      white-space: nowrap;
+    }
+    .main {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      color: white;
+      z-index: 2;
+    }
+    .content {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      color: white;
+      z-index: 1;
+    }
+    .btn-wrapper {
+      display: inline-block;
+      width: 100vw;
+      height: 100vh;
+      padding-top: calc(50vh - 50px);
+      margin-left: calc(50vw - 250px);
+    }
+    .btn-area {
+      width: 500px;
+      height: 100px;
+    }
+    .btn {
+      cursor: pointer;
+      position: relative;
+      display: inline-block;
+      text-align: center;
+      width: 96px;
+      height: 96px;
+      margin: 0 73px;
+      border: 2px solid white;
+      border-radius: 50px;
+      background: black;
+    }
+    .btn-text {
+      margin: 40px auto;
+      line-height: 20px;
+    }
+
+    .bg-video {
+      height: 100vh;
+      perspective: 1000;
+      position: absolute;
+      z-index: 1;
+      -webkit-filter: opacity(50%);
+      -webkit-filter: brightness(50%);
+    }
+    .text-wrapper {
+      position: absolute;
+      z-index: 2;
+      width: 100vw;
+      height: 100vh;
+    }
+    .text-area {
+      text-align: center;
+      padding: 10vh 10vw;
+      letter-spacing: 1.5px;
+      font-weight: bold !important;
+    }
+    .main-menu {
+      position: absolute;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      justify-content: space-between;
+      align-items: stretch;
+      align-content: stretch;
+      width: 100vw;
+      top: 10px;
+      left: 10px;
+      background-color: black;
+      z-index: 3;
+    }
+    .entry-btn {
+      display: inline-block;
+      height: 50px;
+      margin: 10px 20px;
+    }
+
+    .vib-holo {
+      display: none;
+      position: absolute;
+      top: -2px;
+      left: 0;
+      width: 96px;
+      height: 96px;
+      border-radius: 50px;
+      z-index: 1;
+    }
+    .red-vib {
+      border: 2px solid rgba(250, 0, 0, 0.5);
+      color: rgba(250, 0, 0, 0.5);
+    }
+    .green-vib {
+      border: 2px solid rgba(0, 250, 0, 0.5);
+      color: rgba(0, 250, 0, 0.5);
+    }
+    .blue-vib {
+      border: 2px solid rgba(0, 0, 250, 0.5);
+      color: rgba(0, 0, 250, 0.5);
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      text-align: center;
+      z-index: 1;
+      padding-top: calc(50vh - 10px);
+      background-color: black;
+      color: white;
+    }
+    .clock-wrapper {
+      position: relative;
+      width: 100%;
+      height: calc(50vh + 140px);
+      padding-top: calc(50vh - 140px);
+      padding-left: calc(50vw - 420px);
+      background-color: black;
+    }
+    .clock-area {
+      position: relative;
+      width: 840px;
+      height: 280px;
+    }
+    .projector {
+      position: absolute;
+      bottom: 40px;
+      left: calc(50vw - 25px);
+      width: 50px;
+      height: 50px;
+      border-radius: 25px;
+      background-color: black;
+      z-index: 9;
+    }
+    .lightDot {
+      display: none;
+      position: absolute;
+      bottom: 40px;
+      left: calc(50vw - 25px);
+      width: 50px;
+      height: 50px;
+      border-radius: 25px;
+      z-index: 9;
+    }
+    .lightHoloCenter {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      border-radius: 25px;
+      background-color: white;
+      z-index: 8;
+    }
+    .lightHolo {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      border-radius: 25px;
+      background-color: rgba(42, 166, 63, 0.9);
+      z-index: 7;
+    }
+    .dot {
+      margin: 4px;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background-color: white;
+    }
+
+    .text {
+      position: absolute;
+      width: 640px;
+      height: 218px;
+      margin-top: calc(50vh - 120px);
+      margin-left: calc(50vw - 320px);
+      z-index: 99;
+    }
+    .banner-video {
+      position: absolute;
+      width: 100vw;
+      height: 100vh;
+      z-index: 9;
+    }
+    .text-tag {
+      text-align: center;
+      position: relative;
+      float: right;
+      height: 24px;
+      width: 80px;
+      border-radius: 12px;
+      background-color: #fff;
+    }
+    .text-tag h2 {
+      text-align: center;
+      padding: 0 !important;
+      margin: 0 auto !important;
+      font-size: 16px !important;
+      font-weight: 800 !important;
+      color: black;
+    }
+
+    #background-video {
+      object-fit: fill;
+      position: absolute;
+      perspective: 1000;
+      z-index: -1;
+      //-webkit-filter: opacity(50%);
+      -webkit-filter: brightness(70%);
+    }
+  </style>
+</html>

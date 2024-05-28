@@ -1,10 +1,11 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8" />
     <title>BIGNESS</title>
     <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.7/vue.min.js"></script>
   </head>
+
   <body>
     <div id="app">
       <div class="wrapper" v-for="(p, idx) in config" :key="idx">
@@ -34,7 +35,7 @@
       </div>
     </div>
 
-     <script>
+    <script>
       new Vue({
         el: "#app",
         data() {
@@ -79,22 +80,28 @@
           };
         },
         mounted() {
+          this.fetchData();
         },
         methods: {
+          fetchData() {
+            // axios
+            //   .get(
+            //     "https://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL?format=json&date=2010:2018"
+            //   )
+            //   .then((response) => {
+            //     const data = this.processData(response.data);
+            //     this.renderChart(data);
+            //   })
+            //   .catch((error) => {
+            //     console.error(error);
+            //   });
+          },
           toggleWindow() {},
         },
       });
+    </script>
   </body>
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXJF2NR377"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-XXJF2NR377');
-</script>
-     <style>
+  <style>
     body {
       margin: 0;
       width: 100vw;

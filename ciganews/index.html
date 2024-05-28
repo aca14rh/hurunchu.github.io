@@ -85,7 +85,7 @@ let refreshNews = () => {
     (res) => {
       // console.log(res);
       let kwords = [],
-        news = res.list,
+        news = res,
         newsCount = news.length;
 
       for (let i = 0; i < newsCount; i++) {

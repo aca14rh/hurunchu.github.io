@@ -1,8 +1,89 @@
 <!doctype html>
 <html>
+  <head>
+    <meta charset="utf-8" />
+    <title>BIGNESS</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.7/vue.min.js"></script>
+  </head>
   <body>
-    <p1>home under construction</p1>
-    <a href="./page" />
+    <div id="app">
+      <div class="wrapper" v-for="(p, idx) in config" :key="idx">
+        <!-- todo: content window -->
+        <div class="window" v-if="p.showContent">
+          <iframe :src="p.url" width="100%" height="100%"></iframe>
+        </div>
+        <div class="row">
+          <!-- number&pointer -->
+          <div class="no" :style="{opacity: p.hover ? 0 : 1}">{{p.no}}</div>
+          <div
+            class="select"
+            :style="{opacity: p.hover ? 1 : 0, left: p.hover ? 0 : '-10px'}"
+          >
+            →
+          </div>
+          <!-- content button -->
+          <div
+            class="title"
+            @mouseover="p.hover = true"
+            @mouseout="p.hover = false"
+            @click="window.open(p.url)"
+          >
+            <span>{{p.title}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+     <script>
+      new Vue({
+        el: "#app",
+        data() {
+          return {
+            config: [
+              {
+                no: 4,
+                title: "DEATH STRANDING",
+                url: "https://my.bigness.fun/deathstranding/",
+                hover: false,
+                showContent: false,
+              },
+              {
+                no: 3,
+                title: "SHEFFIELD",
+                url: "https://my.bigness.fun/sheffield/",
+                hover: false,
+                showContent: false,
+              },
+              {
+                no: 2,
+                title: "POPPERS",
+                url: "https://my.bigness.fun/pop/",
+                hover: false,
+                showContent: false,
+              },
+              {
+                no: 1,
+                title: "HAVE A CIGA",
+                url: "https://my.bigness.fun/ciganews/",
+                hover: false,
+                showContent: false,
+              },
+              {
+                no: "G",
+                title: "THE DOT",
+                url: "https://my.bigness.fun/dotdot/",
+                hover: false,
+                showContent: false,
+              },
+            ],
+          };
+        },
+        mounted() {
+        },
+        methods: {
+          toggleWindow() {},
+        },
+      });
   </body>
   <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXJF2NR377"></script>
@@ -13,4 +94,82 @@
 
   gtag('config', 'G-XXJF2NR377');
 </script>
+     <style>
+    body {
+      margin: 0;
+      width: 100vw;
+      height: 100vh;
+      text-align: center;
+      overflow: hidden;
+      background-color: #817565;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .window {
+      width: 100vw;
+      height: 80vh;
+      background-color: #000;
+      border: none;
+    }
+    .wrapper {
+      position: relative;
+    }
+    .row {
+      position: relative;
+      margin: 15px;
+    }
+    .select {
+      position: absolute;
+      top: 0;
+      left: 0;
+      text-align: center;
+      width: 74px;
+      height: 74px;
+      font-size: 50px;
+      font-weight: 200;
+      padding: 5px;
+      transition: opacity 0.5s, left 0.5s ease;
+    }
+    .no {
+      display: inline-block;
+      vertical-align: middle;
+      text-align: center;
+      width: 70px;
+      height: 70px;
+      border: 2px solid #121212;
+      border-radius: 34px;
+      font-size: 50px;
+      font-weight: 200;
+      padding: 5px;
+      margin-right: 10px;
+      transition: opacity 0.5s;
+    }
+    .title {
+      cursor: pointer;
+      display: inline-block;
+      vertical-align: middle;
+      text-align: center;
+      position: relative;
+      width: 280px;
+      height: 80px;
+      border: 2px solid #121212;
+      border-radius: 35px;
+      font-size: 20px;
+      font-weight: 400;
+      padding: 0 30px;
+      background-color: #817565;
+      transition: background-color 0.5s ease, color 0.5s ease;
+    }
+    .title span {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .title:hover {
+      background-color: #121212;
+      color: #817565;
+    }
+  </style>
 </html>

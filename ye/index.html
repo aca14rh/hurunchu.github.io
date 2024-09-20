@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>HTML to Image</title>
+        <style>
+            body {
+                text-align: center;
+            }
+            .content {
+                width: calc(100vw - 20px);
+                padding-top: calc(33vw - 30px);
+                height: calc(67vw + 10px);
+                background-color: rgb(198, 198, 198);
+                text-align: center;
+                font-weight: bold;
+                line-height: 28px;
+                font-size: 14px;
+                font-family: 'SimHeiBold', sans-serif;
+                letter-spacing: -0.5px;
+            }
+            form {
+                display: flex;
+                font-size: 14px;
+                flex-direction: column;
+                width: 300px;
+                margin: auto;
+            }
+            div {
+                margin-bottom: 10px;
+            }
+            label {
+                margin-bottom: 5px;
+            }
+            input,
+            select {
+                padding: 5px;
+                font-size: 14px;
+                width: 150px;
+            }
+            select {
+                height: 30px;
+                width: 165px;
+            }
+            #line {
+                position: relative;
+            }
+            #line::after {
+                content: '';
+                position: absolute;
+                top: 45px;
+                left: 54%;
+                bottom: -2px;
+                width: 2px;
+                height: 20px;
+                background-color: #fff;
+                transform: scale(1, 4);
+            }
+            #line::before {
+                content: '';
+                position: absolute;
+                top: 19px;
+                left: 40%;
+                bottom: -2px;
+                width: 2px;
+                height: 25px;
+                background-color: #fff;
+            }
+            button {
+                padding: 10px;
+                font-size: 16px;
+                cursor: pointer;
+            }
+        </style>
+    </head>
+    <body>
+        <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.8/vue.js"></script>
+        <div id="app">
+            <form @submit.prevent="handleSubmit">
+                <div>
+                    <label for="mood">心情:</label>
+                    <input type="text" id="mood" v-model="mood" maxlength="1" required />
+                </div>
+                <div>
+                    <label for="event">事件:</label>
+                    <input type="text" id="event" v-model="event" :maxlength="7" required />
+                </div>
+                <div>
+                    <label for="location">地点:</label>
+                    <input type="text" id="location" v-model="location" :maxlength="5" required />
+                </div>
+                <div>
+                    <label for="date">时间:</label>
+                    <input
+                        type="date"
+                        id="date"
+                        v-model="date"
+                        required
+                        @change="formatDateToChinese"
+                    />
+                </div>
+                <div>
+                    <label for="dropdown">风格:</label>
+                    <select id="dropdown" v-model="style" required>
+                        <option value="ye">ye</option>
+                        <option value="her">her</option>
+                        <option value="kojima">kojima</option>
+                    </select>
+                </div>
+            </form>
+            <div
+                class="content"
+                id="content"
+                :style="{color: styles[style].color, background: styles[style].bgColor}"
+            >
+                <p>{{mood || 'void'}}</p>
+                <p>{{event || 'void'}}</p>
+                <p>{{location || 'void'}}</p>
+                <p :id="style === 'kojima' ? 'line' : ''">{{fineDate || 'void'}}</p>
+            </div>
+            <button @click="exportAsImage()" style="margin-top: 20px">导出图片</button>
+        </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
+        <script>
+            new Vue({
+                el: '#app',
+                data: {
+                    mood: '¥',
+                    event: '试听会',
+                    location: '海口',
+                    date: '2024-09-27',
+                    fineDate: '二零二四年九月二十八日',
+                    style: 'ye',
+                    styles: {
+                        ye: { color: '#000', bgColor: 'rgb(198, 198, 198)' },
+                        her: { color: '#fff', bgColor: '#cf402a' },
+                        kojima: { color: '#fff', bgColor: '#000' }
+                    }
+                },
+                methods: {
+                    formatDateToChinese() {
+                        const dateObj = new Date(this.date);
+                        const year = dateObj.getFullYear();
+                        const month = dateObj.getMonth() + 1;
+                        const day = dateObj.getDate();
+                        this.fineDate = `${this.convertToChinese(year)}年${this.convertToChinese(
+                            month
+                        )}月${this.convertToChinese(day)}日`;
+                    },
+                    convertToChinese(num) {
+                        const chineseNumbers = [
+                            '零',
+                            '一',
+                            '二',
+                            '三',
+                            '四',
+                            '五',
+                            '六',
+                            '七',
+                            '八',
+                            '九'
+                        ];
+                        return String(num)
+                            .split('')
+                            .map(digit => chineseNumbers[digit])
+                            .join('');
+                    },
+                    exportAsImage() {
+                        var element = document.getElementById('content');
+                        domtoimage
+                            .toPng(element)
+                            .then(function (dataUrl) {
+                                var link = document.createElement('a');
+                                link.href = dataUrl;
+                                link.download = 'exported_image.png';
+                                link.click();
+                            })
+                            .catch(function (error) {
+                                console.error('oops, something went wrong!', error);
+                            });
+                    }
+                }
+            });
+        </script>
+    </body>
+</html>

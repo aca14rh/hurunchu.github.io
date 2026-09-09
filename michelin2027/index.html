@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>2027寻味蓉城 · 成都米其林指南精准地图 · 84家餐厅</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; min-height: 100vh; background: #f4ebd9;
+    font-family: 'Noto Serif SC', 'Songti SC', serif; color: #1a1a1a; }
+  body { padding: 32px; }
+
+  /* 海报容器 */
+  .poster { width: 1400px; max-width: 100%; margin: 0 auto; background: linear-gradient(180deg,#fbf3e2 0%,#f5e7c6 100%);
+    border: 2px solid #6e1f1f; box-shadow: 0 0 0 10px #f5e7c6, 0 0 0 12px #6e1f1f, 0 20px 50px rgba(0,0,0,.2);
+    padding: 36px 44px 28px 44px; position: relative; }
+
+  /* 头部 */
+  .header { display: flex; justify-content: space-between; align-items: flex-end;
+    border-bottom: 1px solid #b8862f; padding-bottom: 14px; margin-bottom: 14px; }
+  .header-left { font-family: 'Noto Sans SC', sans-serif; color: #6e1f1f; font-size: 12px; letter-spacing: 2px; }
+  .header-right { text-align: right; font-family: 'Noto Sans SC', sans-serif; color: #6e1f1f; font-size: 12px; letter-spacing: 2px; }
+  .header-right .en { font-size: 10px; opacity: .65; margin-top: 3px; letter-spacing: 1.5px; }
+
+  /* 大标题 */
+  h1 { font-family: 'Noto Serif SC', serif; text-align: center; font-size: 72px; font-weight: 900;
+    letter-spacing: 12px; color: #6e1f1f; margin: 14px 0 4px; }
+  h1 .en { display: block; font-family: 'Noto Sans SC', sans-serif; font-size: 14px; letter-spacing: 8px;
+    color: #8b5a2b; font-weight: 400; margin-top: 6px; }
+  .subtitle { text-align: center; font-size: 13px; letter-spacing: 4px; color: #6e1f1f;
+    font-family: 'Noto Sans SC', sans-serif; margin-bottom: 22px; }
+
+  /* 主体：左 map + 右 列表 */
+  .main { display: grid; grid-template-columns: 1.45fr 1fr; gap: 24px; }
+
+  /* 地图 */
+  .map-card { background: #fff; border: 2px solid #b8862f; border-radius: 4px; overflow: hidden;
+    box-shadow: 0 4px 14px rgba(110,31,31,.15); position: relative; }
+  #map { width: 100%; aspect-ratio: 3 / 4; min-height: 420px; background: #e4e4e2; }
+
+  /* 瓦片加载遮罩（正在联网取图时提示） */
+  .tile-hint { position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+    background: rgba(255,255,255,.94); border: 1px solid #b8862f; padding: 6px 14px;
+    border-radius: 20px; font-family: 'Noto Sans SC', sans-serif; font-size: 12px;
+    color: #6e1f1f; letter-spacing: 1px; z-index: 500; pointer-events: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,.12); transition: opacity .4s; }
+  .tile-hint.hide { opacity: 0; }
+
+  .map-overlay { position: absolute; bottom: 16px; left: 16px; background: rgba(255,255,255,.92);
+    border: 1px solid #b8862f; padding: 6px 12px; border-radius: 4px;
+    font-family: 'Noto Sans SC', sans-serif; font-size: 11px; color: #6e1f1f; letter-spacing: 1px; }
+  .map-overlay .attribution { font-size: 9px; color: #999; margin-top: 2px; }
+
+  /* 右侧栏 */
+  .side { display: flex; flex-direction: column; gap: 18px; }
+
+  /* 数据栏 */
+  .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .stat { text-align: center; padding: 10px 4px; border-radius: 4px; color: #fff;
+    font-family: 'Noto Sans SC', sans-serif; }
+  .stat .n { font-size: 24px; font-weight: 700; display: block; }
+  .stat .l { font-size: 11px; opacity: .9; letter-spacing: 1px; }
+  .stat[data-cat="3"] { background: #6e1f1f; }
+  .stat[data-cat="2"] { background: #b8862f; }
+  .stat[data-cat="1"] { background: #c0392b; }
+  .stat[data-cat="0"] { background: #3b6e9e; }
+  .stat[data-cat="-1"] { background: #5d8a5d; }
+
+  /* 筛选 */
+  .filter { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px; background: #fff;
+    border: 1px solid #b8862f; border-radius: 4px; font-family: 'Noto Sans SC', sans-serif; }
+  .filter label { display: flex; align-items: center; gap: 5px; padding: 4px 10px;
+    border-radius: 12px; cursor: pointer; user-select: none; font-size: 12px; background: #fff5e1;
+    border: 1px solid #c9a263; color: #6e1f1f; }
+  .filter input { display: none; }
+  .filter label.active { background: #6e1f1f; color: #fff; border-color: #6e1f1f; }
+  .filter .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+  /* 餐厅列表 */
+  .list { background: #fff; border: 1px solid #b8862f; border-radius: 4px; overflow: hidden;
+    flex: 1; max-height: 920px; overflow-y: auto; }
+  .list h3 { font-family: 'Noto Serif SC', serif; color: #6e1f1f; font-size: 14px;
+    padding: 10px 14px; background: linear-gradient(90deg,#fdf6e3,#fff);
+    border-bottom: 1px solid #e5d3b3; letter-spacing: 2px; }
+  .list h3 .en { font-family: 'Noto Sans SC', sans-serif; font-size: 10px; color: #b8862f;
+    letter-spacing: 1.5px; margin-left: 8px; }
+  .list-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  .list-grid.cols-1 { grid-template-columns: 1fr; }
+  .list-item { padding: 6px 14px; font-size: 12.5px; color: #1a1a1a; cursor: pointer;
+    border-bottom: 1px dashed #f0e5cf; display: flex; align-items: center; gap: 6px;
+    -webkit-tap-highlight-color: transparent; }
+  @media (hover: hover) { .list-item:hover { background: #fff8e8; } }
+  .list-item:active { background: #f5e1bf; }
+  .list-item .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .list-item .nm { flex: 1; }
+  .list-item .badge { font-size: 9px; padding: 1px 4px; border-radius: 3px;
+    background: #6e1f1f; color: #fff; letter-spacing: .5px; }
+  .list-item .badge.new { background: #d4751c; }
+  .list-item .badge.green { background: #2e7d4f; }
+
+  /* 底部 */
+  .footer { margin-top: 18px; padding-top: 14px; border-top: 1px solid #b8862f;
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: 'Noto Sans SC', sans-serif; font-size: 11px; color: #6e1f1f; letter-spacing: 2px; }
+  .footer .seal { font-family: 'Noto Serif SC', serif; font-weight: 900; font-size: 18px;
+    color: #fff; background: #6e1f1f; padding: 6px 12px; letter-spacing: 4px;
+    border: 2px solid #b8862f; border-radius: 4px; text-align: center; line-height: 1.1; }
+
+  /* 自定义 marker */
+  .marker-icon { border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 11px; font-weight: 700; font-family: 'Noto Sans SC', sans-serif;
+    box-shadow: 0 2px 6px rgba(0,0,0,.35); border: 2px solid #fff; }
+  .marker-icon.cat3 { width: 30px; height: 30px; background: #6e1f1f; font-size: 14px; }
+  .marker-icon.cat2 { width: 26px; height: 26px; background: #b8862f; font-size: 10px; }
+  .marker-icon.cat1 { width: 22px; height: 22px; background: #c0392b; font-size: 11px; }
+  .marker-icon.cat0 { width: 16px; height: 16px; background: #3b6e9e; font-size: 9px; }
+  .marker-icon.cat-1 { width: 14px; height: 14px; background: #5d8a5d; font-size: 8px; }
+
+  /* popup */
+  .leaflet-popup-content-wrapper { background: #fdf6e3; color: #1a1a1a; border-radius: 6px;
+    border: 1px solid #b8862f; box-shadow: 0 4px 14px rgba(110,31,31,.25); }
+  .leaflet-popup-tip { background: #fdf6e3; }
+  .popup { min-width: 240px; padding: 4px; }
+  .popup h4 { color: #6e1f1f; font-family: 'Noto Serif SC', serif; font-size: 16px;
+    margin-bottom: 4px; letter-spacing: 1px; }
+  .popup h4 .en { color: #b8862f; font-family: 'Noto Sans SC', sans-serif; font-size: 11px;
+    margin-left: 4px; letter-spacing: 1px; }
+  .popup .cat { display: inline-block; padding: 2px 8px; border-radius: 10px; color: #fff;
+    font-size: 11px; font-family: 'Noto Sans SC', sans-serif; letter-spacing: .5px; margin-bottom: 6px; }
+  .popup .addr { font-size: 12px; color: #555; line-height: 1.45; margin-top: 4px;
+    font-family: 'Noto Sans SC', sans-serif; }
+  .popup .meta { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+  .popup .badge { font-size: 10px; padding: 1px 6px; border-radius: 4px;
+    background: #6e1f1f; color: #fff; font-family: 'Noto Sans SC', sans-serif; }
+  .popup .badge.new { background: #d4751c; }
+  .popup .badge.green { background: #2e7d4f; }
+
+  /* ================= 移动端 / 平板 响应式(功能不变,仅视图与触控优化) ================= */
+  @media (max-width: 900px){
+    body { padding: 8px 6px 26px; }
+    .poster { padding: 16px 12px 18px; border-width: 1px;
+      box-shadow: 0 0 0 4px #f7e8cd, 0 0 0 5px #6e1f1f, 0 14px 34px rgba(0,0,0,.18); }
+    .header { flex-direction: column; align-items: flex-start; gap: 5px;
+      padding-bottom: 10px; margin-bottom: 10px; }
+    .header-left > div:first-child { font-size: 15px; letter-spacing: 3px; }
+    .header-right { text-align: left; font-size: 10px; letter-spacing: 1.5px; }
+    h1 { font-size: clamp(24px, 7.6vw, 40px); letter-spacing: 1px; margin: 12px 0 2px;
+      white-space: normal; line-height: 1.2; }
+    h1 .en { font-size: 8px; letter-spacing: 2px; margin-top: 7px; }
+    .subtitle { font-size: 10.5px; letter-spacing: 2px; margin-bottom: 14px; }
+    .main { grid-template-columns: 1fr; gap: 14px; }
+    #map { aspect-ratio: 3 / 4; min-height: 0; }
+    .side { gap: 12px; }
+    .stats-row { grid-template-columns: repeat(3, 1fr); gap: 5px; }
+    .stat { padding: 8px 2px; }
+    .stat .n { font-size: 20px; }
+    .stat .l { font-size: 9.5px; letter-spacing: .5px; }
+    .filter { padding: 9px; gap: 7px; }
+    .filter label { padding: 7px 12px; font-size: 11.5px; gap: 5px;
+      -webkit-tap-highlight-color: transparent; }
+    .filter label:active { background: #8a2f2f; }
+    .list { max-height: 58vh; }
+    .list-grid { grid-template-columns: 1fr; }
+    .list h3 { padding: 9px 12px; font-size: 13px; }
+    .list-item { padding: 11px 13px; font-size: 13.5px; min-height: 42px; }
+    .list-item .badge { font-size: 8.5px; }
+    .footer { flex-direction: column; align-items: flex-start; gap: 8px;
+      padding-right: 96px; font-size: 9.5px; letter-spacing: 1px; position: relative; line-height: 1.6; }
+    .footer .seal { position: absolute; right: 0; bottom: 2px; font-size: 12px; padding: 5px 9px; }
+    .map-overlay { left: 8px; bottom: 44px; padding: 5px 9px; font-size: 9px; max-width: 72%; line-height: 1.5; }
+    .popup { min-width: 0; }
+    .popup h4 { font-size: 15px; }
+    .popup h4 .en { font-size: 9.5px; display: block; margin: 2px 0 0; }
+    .popup .addr { font-size: 11.5px; }
+    /* Leaflet 控件触控友好化 */
+    .leaflet-control-zoom a { width: 40px; height: 40px; line-height: 38px; font-size: 22px; }
+    .leaflet-control-zoom { box-shadow: 0 2px 8px rgba(0,0,0,.25); }
+  }
+  @media (max-width: 380px){
+    h1 { letter-spacing: 2px; }
+    .list-item { font-size: 12.5px; padding: 10px 11px; }
+  }
+
+</style>
+</head>
+<body>
+
+<div class="poster">
+
+  <!-- 头部 -->
+  <div class="header">
+    <div class="header-left">
+      <div style="font-size:18px;font-weight:700;letter-spacing:4px;">MICHELIN</div>
+      <div style="opacity:.7;">GUIDE CHENGDU · 第 6 版</div>
+    </div>
+    <div class="header-right">
+      <div>OFFICIAL EDITION · 2026.09</div>
+      <div class="en">RELEASED 03 SEP 2026</div>
+    </div>
+  </div>
+
+  <!-- 标题 -->
+  <h1>2027 寻 味 蓉 城<span class="en">CHENGDU MICHELIN GUIDE · PRECISE MAP</span></h1>
+  <div class="subtitle">精 准 地 图 · 实 时 标 注 · 84 家 餐 厅</div>
+
+  <!-- 数据栏 -->
+  <div class="stats-row" id="statsRow"></div>
+
+  <!-- 主体 -->
+  <div class="main">
+
+    <!-- 左：地图 -->
+    <div class="map-card" id="mapCard">
+      <div id="map"></div>
+      <div class="tile-hint" id="tileHint">正在加载地图底图…</div>
+      <div class="map-overlay">
+        数据 · 米其林指南官方（2026.09.03 发布）<br>
+        <div class="attribution">底图 · 高德地图 © AutoNavi · 坐标 · GCJ-02</div>
+      </div>
+    </div>
+
+    <!-- 右：筛选 + 列表 -->
+    <div class="side">
+
+      <div class="filter" id="filterBar">
+        <label class="active" data-id="all"><span class="dot" style="background:#6e1f1f"></span>全部 84</label>
+      </div>
+
+      <div class="list" id="listContainer"></div>
+    </div>
+
+  </div>
+
+  <!-- 底部 -->
+  <div class="footer">
+    <div>数据来源 · 米其林指南官方（2026 年 9 月 3 日发布） · 第 6 版 · 共 84 家餐厅</div>
+    <div class="seal">寻味<br>蓉城</div>
+  </div>
+
+</div>
+
+<script>
+const CATEGORIES = [{"id": 3, "name": "米其林三星", "color": "#6e1f1f", "count": 1}, {"id": 2, "name": "米其林二星", "color": "#b8862f", "count": 1}, {"id": 1, "name": "米其林一星", "color": "#c0392b", "count": 13}, {"id": 0, "name": "必比登推介", "color": "#3b6e9e", "count": 32}, {"id": -1, "name": "指南入选餐厅", "color": "#5d8a5d", "count": 37}];
+const RESTAURANTS = [{"name":"新荣记","en":"Xin Rong Ji","category":"3星 · 粤菜·台州海鲜","category_id":3,"address":"成都市锦江区红星路与大业路交界 IFS 国际金融中心 5 层","lng":104.0815,"lat":30.6544,"promoted":true,"new":false},{"name":"玉芝兰","en":"Yu Zhi Lan","category":"2星 · 官府菜","category_id":2,"address":"成都市青羊区长发街 55 号附 10 号","lng":104.0718,"lat":30.6825,"promoted":false,"new":false},{"name":"柴门荟","en":"Chai Men Hui","category":"1星 · 川菜","category_id":1,"address":"成都市武侯区人民南路二段 21 号望江宾馆","lng":104.0785,"lat":30.6395,"promoted":false,"new":false},{"name":"谧寻茶室","en":"Mi Xun Tea House","category":"1星 · 素食·茶艺","category_id":1,"address":"成都市锦江区中纱帽街 8 号成都太古里 博舍酒店","lng":104.0826,"lat":30.6556,"promoted":false,"new":false,"green_star":true},{"name":"蔻 Co-","en":"Co-","category":"1星 · 现代欧陆","category_id":1,"address":"成都市锦江区IFS 国际金融中心 5 层","lng":104.082,"lat":30.6548,"promoted":false,"new":false},{"name":"银锅","en":"Yin Guo","category":"1星 · 川式融合","category_id":1,"address":"成都市武侯区人民南路四段 银石广场","lng":104.0661,"lat":30.628,"promoted":false,"new":false},{"name":"芳香景","en":"Fang Xiang Jing","category":"1星 · 川菜","category_id":1,"address":"成都市锦江区中纱帽街 太古里","lng":104.0831,"lat":30.6562,"promoted":false,"new":false},{"name":"The Hall 会馆","en":"The Hall","category":"1星 · 创意菜","category_id":1,"address":"成都市锦江区三圣乡 蓝顶艺术中心","lng":104.115,"lat":30.631,"promoted":false,"new":false},{"name":"许家菜","en":"Xu Jia Cai","category":"1星 · 川菜","category_id":1,"address":"成都市武侯区科华北路 65 号","lng":104.079,"lat":30.636,"promoted":false,"new":false},{"name":"Focus by Bill Yue","en":"Focus by Bill Yue","category":"1星 · 现代法餐","category_id":1,"address":"成都市锦江区东大街 晶融汇","lng":104.084,"lat":30.6595,"promoted":false,"new":true},{"name":"芙蓉凰","en":"Fu Rong Huang","category":"1星 · 川菜","category_id":1,"address":"成都市锦江区人民东路 锦江宾馆","lng":104.072,"lat":30.651,"promoted":false,"new":false},{"name":"漾亚·雍雅合鲜","en":"Yangya Yongya","category":"1星 · 淮扬菜·海鲜","category_id":1,"address":"成都市武侯区人民南路四段 棕榈泉国际中心","lng":104.0675,"lat":30.6285,"promoted":false,"new":false},{"name":"福满楼","en":"Fu Man Lou","category":"1星 · 川菜","category_id":1,"address":"成都市锦江区太升北路 55 号","lng":104.075,"lat":30.67,"promoted":false,"new":false},{"name":"梓楠","en":"Zi Nan","category":"1星 · 川菜","category_id":1,"address":"成都市锦江区中纱帽街 成都 IFS 5 层","lng":104.0828,"lat":30.655,"promoted":false,"new":true},{"name":"马旺子(锦江)","en":"Ma Wang Zi (Jinjiang)","category":"1星 · 川菜·江湖菜","category_id":1,"address":"成都市锦江区汇泉南路 107 号","lng":104.089,"lat":30.644,"promoted":false,"new":false},{"name":"百年粉蒸牛肉","en":"Bainian Steamed Beef","category":"必比登 · 川式家常","category_id":0,"address":"成都市青羊区鼓楼北二街 11 号","lng":104.072,"lat":30.673,"new":false},{"name":"半天特色面","en":"Bantian Special Noodles","category":"必比登 · 面馆","category_id":0,"address":"成都市武侯区武侯祠大街","lng":104.048,"lat":30.642,"new":true},{"name":"打牙祭","en":"Da Ya Ji","category":"必比登 · 江湖菜","category_id":0,"address":"成都市锦江区东安南路","lng":104.085,"lat":30.648,"new":true},{"name":"厝下","en":"Cuo Xia","category":"必比登 · 闽菜","category_id":0,"address":"成都市青羊区宽窄巷子附近","lng":104.0605,"lat":30.669,"new":false},{"name":"陈麻婆豆腐","en":"Chen Mapo Tofu","category":"必比登 · 川菜老字号","category_id":0,"address":"成都市青羊区西玉龙街 197 号","lng":104.072,"lat":30.664,"new":false},{"name":"归田院子","en":"Gui Tian Yuanzi","category":"必比登 · 农家菜","category_id":0,"address":"成都市成华区仁义路59号","lng":104.1005,"lat":30.6632,"new":true},{"name":"甘记肥肠粉","en":"Gan Ji Fei Chang Fen","category":"必比登 · 小吃","category_id":0,"address":"成都市青羊区马鞍北路 18 号","lng":104.076,"lat":30.684,"new":false},{"name":"观锦","en":"Guan Jin","category":"必比登 · 川菜","category_id":0,"address":"成都市锦江区中纱帽街 太古里","lng":104.0832,"lat":30.6566,"new":false},{"name":"恭州·巴蜀味苑","en":"Gongzhou Bashu","category":"必比登 · 重庆风味","category_id":0,"address":"成都市武侯区科华北路","lng":104.077,"lat":30.6385,"new":false},{"name":"胡二哥药膳蹄花","en":"Hu Er Ge Yao Shan Ti Hua","category":"必比登 · 药膳·川菜","category_id":0,"address":"成都市青羊区人民公园附近","lng":104.062,"lat":30.662,"new":false},{"name":"喜玉饺子酒","en":"Xi Yu Dumpling Wine","category":"必比登 · 东北菜","category_id":0,"address":"成都市武侯区玉林南路","lng":104.066,"lat":30.626,"new":false},{"name":"老成都逸城鲜三样面","en":"Lao Chengdu Yicheng Noodles","category":"必比登 · 面馆","category_id":0,"address":"成都市金牛区解放路","lng":104.084,"lat":30.69,"new":false},{"name":"龙森园(青羊)","en":"Long Sen Yuan (Qingyang)","category":"必比登 · 川菜","category_id":0,"address":"成都市青羊区青羊大道","lng":104.056,"lat":30.671,"new":false},{"name":"茅屋大酒店","en":"Mao Wu Hotel Restaurant","category":"必比登 · 农家菜","category_id":0,"address":"成都市双流区九江街道甘泉街2号","lng":103.9155,"lat":30.6189,"new":true},{"name":"组织向南","en":"Zu Zhi Xiang Nan","category":"必比登 · 创意菜","category_id":0,"address":"成都市武侯区紫荆南路","lng":104.06,"lat":30.629,"new":false},{"name":"漫得(武侯)","en":"Man De (Wuhou)","category":"必比登 · 茶饮·甜品","category_id":0,"address":"成都市武侯区人民南路","lng":104.064,"lat":30.633,"new":false},{"name":"人仁水饺","en":"Ren Ren Shui Jiao","category":"必比登 · 东北水饺","category_id":0,"address":"成都市锦江区水井坊","lng":104.087,"lat":30.643,"new":true},{"name":"茉筱馆","en":"Mo Xiao Guan","category":"必比登 · 创意西餐","category_id":0,"address":"成都市青羊区宽窄巷子","lng":104.0615,"lat":30.6695,"new":false},{"name":"荣园餐馆","en":"Rong Yuan Restaurant","category":"必比登 · 川菜","category_id":0,"address":"成都市青羊区府青路","lng":104.085,"lat":30.678,"new":false},{"name":"年丰饭店","en":"Nian Feng Restaurant","category":"必比登 · 川菜","category_id":0,"address":"成都市武侯区科华北路","lng":104.079,"lat":30.639,"new":false},{"name":"蓉荣北大铺盖面","en":"Rong Rong Bei Da Pugai Mian","category":"必比登 · 面馆","category_id":0,"address":"成都市金牛区 一环路北二段","lng":104.068,"lat":30.694,"new":false},{"name":"吴氏荟(锦江)","en":"Wu Shi Hui (Jinjiang)","category":"必比登 · 川菜","category_id":0,"address":"成都市锦江区东锦街","lng":104.089,"lat":30.651,"new":false},{"name":"杨伯英杂酱面","en":"Yang Bo Ying Za Jiang Mian","category":"必比登 · 面馆","category_id":0,"address":"成都市青羊区青羊上街","lng":104.058,"lat":30.667,"new":false},{"name":"37号老院坝抄手","en":"No.37 Old Courtyard Wonton","category":"必比登 · 小吃","category_id":0,"address":"成都市锦江区暑袜南街","lng":104.077,"lat":30.662,"new":true},{"name":"庭院399","en":"Ting Yuan 399","category":"必比登 · 川菜","category_id":0,"address":"成都市武侯区航空路","lng":104.069,"lat":30.622,"new":false},{"name":"幺怪面","en":"Yao Guai Mian","category":"必比登 · 面馆","category_id":0,"address":"成都市金牛区五块石","lng":104.054,"lat":30.709,"new":false},{"name":"万三面馆","en":"Wan San Noodle Shop","category":"必比登 · 面馆","category_id":0,"address":"成都市成华区双桥路","lng":104.108,"lat":30.672,"new":false},{"name":"永乐饭店","en":"Yong Le Restaurant","category":"必比登 · 川菜","category_id":0,"address":"成都市武侯区晋阳路","lng":104.045,"lat":30.64,"new":false},{"name":"吴记怪味面","en":"Wu Ji Guai Wei Mian","category":"必比登 · 面馆","category_id":0,"address":"成都市金牛区花牌坊","lng":104.068,"lat":30.685,"new":false},{"name":"曾牛肉","en":"Zeng Beef","category":"必比登 · 牛肉·面","category_id":0,"address":"成都市金牛区茶店子","lng":104.05,"lat":30.71,"new":false},{"name":"晓友烧麦","en":"Xiao You Shao Mai","category":"必比登 · 烧麦·面点","category_id":0,"address":"成都市青羊区府南新区","lng":104.058,"lat":30.653,"new":true},{"name":"转转会","en":"Zhuan Zhuan Hui","category":"必比登 · 川菜","category_id":0,"address":"成都市武侯区科华北路","lng":104.0775,"lat":30.639,"new":false},{"name":"8号","en":"No.8","category":"入选 · 川菜","category_id":-1,"address":"成都市武侯区桐梓林","lng":104.067,"lat":30.625,"new":false},{"name":"川莆酒楼","en":"Chuan Pu Jiu Lou","category":"入选 · 川菜","category_id":-1,"address":"成都市青羊区人民中路","lng":104.068,"lat":30.665,"new":false},{"name":"银芭1986","en":"Yin Ba 1986","category":"入选 · 川菜·海鲜","category_id":-1,"address":"成都市锦江区中纱帽街 太古里","lng":104.0834,"lat":30.657,"new":false},{"name":"云起食(成华)","en":"Yun Qi Shi (Chenghua)","category":"入选 · 创意菜","category_id":-1,"address":"成都市成华区建设路","lng":104.107,"lat":30.677,"new":false},{"name":"旦(玉林八巷)","en":"Dan (Yulin Baxiang)","category":"入选 · 川菜","category_id":-1,"address":"成都市武侯区玉林八巷","lng":104.065,"lat":30.627,"new":false},{"name":"食物数据库","en":"Food Database","category":"入选 · 创意菜","category_id":-1,"address":"成都市锦江区中纱帽街 太古里","lng":104.083,"lat":30.6568,"new":false},{"name":"布洛斯汀","en":"Blossoming","category":"入选 · 西餐","category_id":-1,"address":"成都市锦江区IFS 5层","lng":104.0817,"lat":30.6546,"new":false},{"name":"福蓉川","en":"Fu Rong Chuan","category":"入选 · 川菜","category_id":-1,"address":"成都市锦江区中纱帽街 太古里","lng":104.0828,"lat":30.6564,"new":true},{"name":"柴门公馆","en":"Chai Men Mansion","category":"入选 · 川菜","category_id":-1,"address":"成都市武侯区科华南路","lng":104.075,"lat":30.633,"new":false},{"name":"隐庐·古法川菜","en":"Yin Lu Classical Sichuan","category":"入选 · 川菜","category_id":-1,"address":"成都市青羊区宽窄巷子","lng":104.061,"lat":30.6693,"new":false},{"name":"禅悦素食","en":"Chan Yue Vegetarian","category":"入选 · 素食","category_id":-1,"address":"成都市青羊区青华路","lng":104.059,"lat":30.669,"new":false},{"name":"华道生活·钰善阁","en":"Huadao Yushan Ge","category":"入选 · 健康素食","category_id":-1,"address":"成都市武侯区人民南路","lng":104.065,"lat":30.634,"new":false},{"name":"锦城印象火锅","en":"Jin Cheng Hot Pot","category":"入选 · 火锅","category_id":-1,"address":"成都市武侯区一品天下大街","lng":104.05,"lat":30.651,"new":false},{"name":"运(华尔道夫)","en":"Yun (Waldorf)","category":"入选 · 西餐","category_id":-1,"address":"成都市锦江区华尔道夫酒店","lng":104.082,"lat":30.661,"new":true},{"name":"丽轩","en":"Li Xuan","category":"入选 · 粤菜","category_id":-1,"address":"成都市武侯区科华北路棕榈泉","lng":104.078,"lat":30.63,"new":false},{"name":"且芳香","en":"Qie Fang Xiang","category":"入选 · 川菜","category_id":-1,"address":"成都市青羊区人民公园附近","lng":104.063,"lat":30.662,"new":false},{"name":"门板儿面","en":"Men Ban Er Mian","category":"入选 · 面馆","category_id":-1,"address":"成都市青羊区西大街","lng":104.0685,"lat":30.667,"new":false},{"name":"蜀府宴","en":"Shu Fu Yan","category":"入选 · 川菜官府菜","category_id":-1,"address":"成都市锦江区中纱帽街 太古里","lng":104.0833,"lat":30.6572,"new":false},{"name":"南堂馆(天顺路)","en":"Nan Tang Guan (Tianshun)","category":"入选 · 川菜","category_id":-1,"address":"成都市青羊区天顺路","lng":104.057,"lat":30.668,"new":false},{"name":"巴国布衣","en":"Ba Guo Bu Yi","category":"入选 · 川菜","category_id":-1,"address":"成都市青羊区人民南路","lng":104.064,"lat":30.665,"new":false},{"name":"南公馆","en":"Nan Gong Guan","category":"入选 · 川菜","category_id":-1,"address":"成都市武侯区桐梓林","lng":104.067,"lat":30.627,"new":false},{"name":"银庐","en":"Yin Lu","category":"入选 · 川菜","category_id":-1,"address":"成都市锦江区中纱帽街 太古里","lng":104.083,"lat":30.657,"new":false},{"name":"新拾玖","en":"Xin Shi Jiu","category":"入选 · 川菜","category_id":-1,"address":"成都市青羊区人民公园","lng":104.0625,"lat":30.6625,"new":false},{"name":"宋川","en":"Song Chuan","category":"入选 · 川菜","category_id":-1,"address":"成都市锦江区中纱帽街 太古里","lng":104.0827,"lat":30.6567,"new":false},{"name":"配德","en":"Pei De","category":"入选 · 淮扬菜","category_id":-1,"address":"成都市青羊区人民南路","lng":104.066,"lat":30.665,"new":false},{"name":"谭家(武侯)","en":"Tan Jia (Wuhou)","category":"入选 · 川菜","category_id":-1,"address":"成都市武侯区桐梓林","lng":104.068,"lat":30.626,"new":false},{"name":"前里","en":"Qian Li","category":"入选 · 川菜","category_id":-1,"address":"成都市青羊区人民公园","lng":104.0628,"lat":30.6628,"new":false},{"name":"廊桥","en":"The Bridge","category":"入选 · 粤菜","category_id":-1,"address":"成都市锦江区安顺廊桥","lng":104.085,"lat":30.639,"new":false},{"name":"湘上湘","en":"Xiang Shang Xiang","category":"入选 · 湘菜","category_id":-1,"address":"成都市武侯区科华北路","lng":104.077,"lat":30.638,"new":false},{"name":"小雅堂屋","en":"Xiao Ya Tang Wu","category":"入选 · 川菜","category_id":-1,"address":"成都市锦江区中纱帽街 太古里","lng":104.0835,"lat":30.6575,"new":true},{"name":"Tivano","en":"Tivano","category":"入选 · 意大利餐","category_id":-1,"address":"成都市武侯区高新天府大道","lng":104.064,"lat":30.557,"new":false},{"name":"同福社","en":"Tong Fu She","category":"入选 · 川菜","category_id":-1,"address":"成都市武侯区人民南路","lng":104.065,"lat":30.634,"new":false},{"name":"薛涛·院子里","en":"Xue Tao Yuan Zi Li","category":"入选 · 川菜","category_id":-1,"address":"成都市锦江区望江楼公园","lng":104.0815,"lat":30.636,"new":false},{"name":"琬琰","en":"Wan Yan","category":"入选 · 川菜","category_id":-1,"address":"成都市青羊区人民公园","lng":104.0635,"lat":30.662,"new":false},{"name":"宴遇·福建荟馆","en":"Yan Yu Fujian Huiguan","category":"入选 · 闽菜","category_id":-1,"address":"成都市武侯区人民南路","lng":104.066,"lat":30.634,"new":false},{"name":"五岳宫","en":"Wu Yue Gong","category":"入选 · 川菜","category_id":-1,"address":"成都市金牛区驷马桥","lng":104.076,"lat":30.696,"new":false},{"name":"如是","en":"Ru Shi","category":"入选 · 川菜","category_id":-1,"address":"成都市武侯区桐梓林东路","lng":104.068,"lat":30.63,"new":false}];
+const CAT_BY_ID = Object.fromEntries(CATEGORIES.map(c => [c.id, c]));
+
+function catColor(id){ return CAT_BY_ID[id]?.color || "#999"; }
+function catName(id){ return CAT_BY_ID[id]?.name || ""; }
+
+// ---------- 数据栏 ----------
+function renderStats(){
+  const total = RESTAURANTS.length;
+  const row = document.getElementById('statsRow');
+  let html = '';
+  for (const c of CATEGORIES){
+    html += `<div class="stat" data-cat="${c.id}"><span class="n">${c.count}</span><span class="l">${c.name}</span></div>`;
+  }
+  html += `<div class="stat" data-cat="all" style="background:#1a1a1a"><span class="n">${total}</span><span class="l">总 计</span></div>`;
+  row.innerHTML = html;
+}
+
+// ---------- 筛选 ----------
+function renderFilter(){
+  const bar = document.getElementById('filterBar');
+  CATEGORIES.forEach(c => {
+    const el = document.createElement('label');
+    el.dataset.id = c.id;
+    el.innerHTML = `<span class="dot" style="background:${c.color}"></span>${c.name} ${c.count}`;
+    bar.appendChild(el);
+  });
+  bar.addEventListener('click', e => {
+    const label = e.target.closest('label');
+    if (!label) return;
+    bar.querySelectorAll('label').forEach(x => x.classList.remove('active'));
+    label.classList.add('active');
+    const id = label.dataset.id;
+    const filtered = id === 'all' ? RESTAURANTS : RESTAURANTS.filter(r => r.category_id === Number(id));
+    renderList(filtered);
+    markers.forEach(m => {
+      const show = id === 'all' || m.r.category_id === Number(id);
+      const icon = m.getIcon();
+      if (show) m.addTo(map); else map.removeLayer(m);
+      icon.options.opacity = show ? 1 : 0;
+    });
+  });
+}
+
+// ---------- 列表 ----------
+function renderList(data){
+  const sorted = [...data].sort((a, b) => b.category_id - a.category_id);
+  const html = sorted.map((r, idx) => `
+    <div class="list-item" data-idx="${idx}">
+      <span class="dot" style="background:${catColor(r.category_id)}"></span>
+      <span class="nm">${r.name}</span>
+      ${r.promoted ? '<span class="badge">升星</span>' : ''}
+      ${r.new ? '<span class="badge new">新晋</span>' : ''}
+      ${r.green_star ? '<span class="badge green">绿星</span>' : ''}
+    </div>
+  `).join('');
+  const box = document.getElementById('listContainer');
+  box.innerHTML = `<h3>餐厅列表 <span class="en">${data.length} RESTAURANTS</span></h3><div class="list-grid">${html}</div>`;
+  // bind clicks（移动端：先把地图带回视口，再飞行并弹出详情，保证“点列表看地图”联动可见）
+  box.querySelectorAll('.list-item').forEach(el => {
+    el.addEventListener('click', () => {
+      const r = sorted[Number(el.dataset.idx)];
+      const m = markers.find(x => x.r === r);
+      const go = () => {
+        map.flyTo([r.lat, r.lng], 14, { duration: 0.8 });
+        if (m) m.openPopup();
+      };
+      if (window.innerWidth <= 900){
+        const mc = document.getElementById('mapCard');
+        mc.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setTimeout(go, 480);
+      } else {
+        go();
+      }
+    });
+  });
+}
+
+// ---------- 地图 ----------
+const map = L.map('map', { zoomControl: true, attributionControl: false, zoomSnap: 0.5 })
+  .setView([30.6595, 104.0735], 12);
+
+// 缩放控件位置随屏幕尺寸自适应(移动端置右下,避开左上返回手势/遮挡)
+const zoomCtl = map.zoomControl;
+function placeZoom(){
+  zoomCtl.setPosition(window.innerWidth <= 900 ? 'bottomright' : 'topleft');
+}
+placeZoom();
+
+// 改用【本地预烘焙好的高德底图】作为 imageOverlay —— 不再依赖任何运行时第三方瓦片请求，
+// 彻底避免预览 iframe 拦截/限流第三方图片导致的白块。坐标 GCJ-02，四角精确对齐。
+const OVERLAY_BOUNDS = L.latLngBounds([30.486551, 103.886719], [30.789037, 104.150391]);
+L.imageOverlay('chengdu_base_z13.png', OVERLAY_BOUNDS, {
+  opacity: 1,
+  zIndex: 0,
+  className: 'base-overlay'
+}).addTo(map);
+
+// 品牌 logo 标签
+const brandIcon = L.divIcon({
+  className: '',
+  html: `<div style="font-family:'Noto Sans SC';font-size:10px;color:#6e1f1f;background:rgba(253,246,227,.92);padding:3px 8px;border:1px solid #b8862f;border-radius:3px;letter-spacing:2px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.15);">寻味蓉城 · 2027</div>`,
+  iconSize: [70, 18],
+  iconAnchor: [-10, 50]
+});
+L.marker([30.7000, 104.1130], { icon: brandIcon }).addTo(map);
+
+// 自定义 marker
+function makeIcon(r){
+  const cls = 'cat' + r.category_id;
+  let label = '';
+  if (r.category_id === 3) label = '★★★';
+  else if (r.category_id === 2) label = '★★';
+  else if (r.category_id === 1) label = '★';
+  else if (r.category_id === 0) label = 'B';
+  else label = '·';
+  return L.divIcon({
+    className: '',
+    html: `<div class="marker-icon ${cls}">${label}</div>`,
+    iconSize: r.category_id >= 1 ? [r.category_id === 3 ? 30 : r.category_id === 2 ? 26 : 22, r.category_id === 3 ? 30 : r.category_id === 2 ? 26 : 22] : [r.category_id === 0 ? 16 : 14, r.category_id === 0 ? 16 : 14],
+    iconAnchor: [r.category_id === 3 ? 15 : r.category_id === 2 ? 13 : r.category_id === 1 ? 11 : r.category_id === 0 ? 8 : 7,
+                 r.category_id === 3 ? 15 : r.category_id === 2 ? 13 : r.category_id === 1 ? 11 : r.category_id === 0 ? 8 : 7]
+  });
+}
+
+const markers = [];
+RESTAURANTS.forEach(r => {
+  const icon = makeIcon(r);
+  const m = L.marker([r.lat, r.lng], { icon });
+  m.r = r;
+  const badges = [];
+  if (r.promoted) badges.push('<span class="badge">升星</span>');
+  if (r.new) badges.push('<span class="badge new">新晋</span>');
+  if (r.green_star) badges.push('<span class="badge green">绿星</span>');
+  m.bindPopup(`
+    <div class="popup">
+      <h4>${r.name}<span class="en">${r.en}</span></h4>
+      <span class="cat" style="background:${catColor(r.category_id)}">${catName(r.category_id)}</span>
+      <div class="addr">${r.address}</div>
+      <div class="meta">${badges.join(' ')}</div>
+    </div>
+  `, { maxWidth: 280 });
+  m.addTo(map);
+  markers.push(m);
+});
+
+// 全部标注后调整地图视野：精确铺满整张预烘焙底图，边缘不留灰线
+const fg = L.featureGroup(markers);
+function fillView(){
+  map.fitBounds(OVERLAY_BOUNDS, { padding: [0, 0], animate: false });
+}
+
+// ---------- 预览面板尺寸校定 ----------
+function reflow(){
+  placeZoom();
+  map.invalidateSize(false);
+  fillView();
+}
+setTimeout(reflow, 40);
+setTimeout(reflow, 200);
+setTimeout(reflow, 500);
+if (typeof ResizeObserver !== 'undefined') {
+  new ResizeObserver(() => reflow()).observe(document.getElementById('map'));
+}
+window.addEventListener('resize', reflow);
+
+// 底图为本地图片，加载完成后隐藏提示并聚焦视野
+const tileHint = document.getElementById('tileHint');
+setTimeout(() => { tileHint.classList.add('hide'); }, 1200);
+setTimeout(() => { fillView(); map.invalidateSize(false); }, 80);
+
+// 初始化
+renderStats();
+renderFilter();
+renderList(RESTAURANTS);
+</script>
+
+</body>
+</html>
